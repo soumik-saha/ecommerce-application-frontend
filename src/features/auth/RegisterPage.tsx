@@ -15,8 +15,16 @@ const schema = z.object({
   firstName: z.string().min(1, 'First name is required'),
   lastName: z.string().min(1, 'Last name is required'),
   email: z.string().email('Invalid email address'),
+  phone: z.string().trim().optional().refine((value) => !value || /^\d{10}$/.test(value), {
+    message: 'Phone must be a 10-digit number',
+  }),
   password: z.string().min(6, 'Password must be at least 6 characters'),
   confirmPassword: z.string(),
+  street: z.string().min(1, 'Street is required'),
+  city: z.string().min(1, 'City is required'),
+  state: z.string().min(1, 'State is required'),
+  zipcode: z.string().min(1, 'Zipcode is required'),
+  country: z.string().min(1, 'Country is required'),
 }).refine((data) => data.password === data.confirmPassword, {
   message: "Passwords don't match",
   path: ['confirmPassword'],
@@ -42,6 +50,14 @@ const RegisterPage: React.FC = () => {
         password: data.password,
         firstName: data.firstName,
         lastName: data.lastName,
+        phone: data.phone || undefined,
+        address: {
+          street: data.street,
+          city: data.city,
+          state: data.state,
+          zipcode: data.zipcode,
+          country: data.country,
+        },
       });
       dispatch(setCredentials(response));
       toast.success('Account created successfully!');
@@ -55,7 +71,7 @@ const RegisterPage: React.FC = () => {
 
   return (
     <div className="flex min-h-[calc(100vh-4rem)] items-center justify-center bg-gray-50 px-4 py-8">
-      <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+      <div className="w-full max-w-2xl rounded-2xl bg-white p-8 shadow-lg">
         <div className="mb-6 text-center">
           <h1 className="text-2xl font-bold text-gray-900">Create account</h1>
           <p className="mt-1 text-sm text-gray-500">Join us today</p>
@@ -83,6 +99,49 @@ const RegisterPage: React.FC = () => {
             error={errors.email?.message}
             {...register('email')}
           />
+          <Input
+            label="Phone (optional)"
+            placeholder="9876543210"
+            error={errors.phone?.message}
+            {...register('phone')}
+          />
+          <div className="rounded-lg border border-gray-200 p-4">
+            <h2 className="text-sm font-semibold text-gray-900">Address</h2>
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2">
+              <Input
+                label="Street"
+                placeholder="MG Road"
+                error={errors.street?.message}
+                {...register('street')}
+              />
+              <Input
+                label="City"
+                placeholder="Bengaluru"
+                error={errors.city?.message}
+                {...register('city')}
+              />
+              <Input
+                label="State"
+                placeholder="Karnataka"
+                error={errors.state?.message}
+                {...register('state')}
+              />
+              <Input
+                label="Zipcode"
+                placeholder="560001"
+                error={errors.zipcode?.message}
+                {...register('zipcode')}
+              />
+              <div className="sm:col-span-2">
+                <Input
+                  label="Country"
+                  placeholder="India"
+                  error={errors.country?.message}
+                  {...register('country')}
+                />
+              </div>
+            </div>
+          </div>
           <Input
             label="Password"
             type="password"

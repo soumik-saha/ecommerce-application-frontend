@@ -82,11 +82,21 @@ export interface LoginRequest {
   password: string;
 }
 
+export interface AddressRequest {
+  street: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+}
+
 export interface RegisterRequest {
+  firstName: string;
+  lastName: string;
   email: string;
+  phone?: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  address: AddressRequest;
 }
 
 export interface ChatMessage {
