@@ -2,6 +2,15 @@ import axiosInstance from '../../services/axiosInstance';
 import type { Page, ProductRequest, ProductResponse } from '../../types';
 import { logger } from '../../utils/logger';
 
+interface AuditLogDownloadFilters {
+  userId?: number;
+  entityType?: string;
+  entityId?: number;
+  action?: string;
+  startDate?: string;
+  endDate?: string;
+}
+
 export const productService = {
   async getProducts(keyword = '', page = 0, size = 10): Promise<Page<ProductResponse>> {
     logger.debug('Loading product list', { keyword, page, size });
@@ -71,6 +80,55 @@ export const productService = {
       logger.info('Product deleted', { id });
     } catch (error) {
       logger.error('Failed to delete product', error, { id });
+      throw error;
+    }
+  },
+
+  async getAllProductsForExport(keyword = ''): Promise<ProductResponse[]> {
+    const pageSize = 100;
+    const maxRecords = 10000;
+    let page = 0;
+    let hasMore = true;
+    const allProducts: ProductResponse[] = [];
+
+    logger.info('Exporting products to CSV', { keyword, pageSize, maxRecords });
+
+    try {
+      while (hasMore) {
+        const response = await this.getProducts(keyword, page, pageSize);
+        allProducts.push(...response.content);
+
+        if (allProducts.length > maxRecords) {
+          throw new Error(`Export limit exceeded. Refine filters to export up to ${maxRecords} products at a time.`);
+        }
+
+        hasMore = !response.last;
+        page += 1;
+      }
+
+      logger.info('Product export data loaded', { count: allProducts.length, keyword });
+      return allProducts;
+    } catch (error) {
+      logger.error('Failed to export products', error, { keyword });
+      throw error;
+    }
+  },
+
+  async downloadAuditLogsCsv(filters: AuditLogDownloadFilters = {}): Promise<Blob> {
+    logger.info('Downloading audit logs CSV', { filters });
+    try {
+      const response = await axiosInstance.get('/api/audit-logs/download', {
+        params: filters,
+        responseType: 'blob',
+        headers: {
+          Accept: 'text/csv',
+        },
+      });
+
+      logger.info('Audit logs CSV downloaded', { size: response.data.size });
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to download audit logs CSV', error, { filters });
       throw error;
     }
   },
