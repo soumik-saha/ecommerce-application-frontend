@@ -1,5 +1,13 @@
 # React + TypeScript + Vite
 
+## Environment Variables
+
+Create a .env file in the project root and set:
+
+VITE_API_BASE_URL=https://ecommerce-application-uat.onrender.com/
+
+The app reads this value for all API requests. You can change it per environment without code changes.
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

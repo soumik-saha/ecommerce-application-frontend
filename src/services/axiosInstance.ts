@@ -4,13 +4,14 @@ import { store } from '../app/store';
 import { setCredentials, logout } from '../features/auth/authSlice';
 import { authService } from '../features/auth/authService';
 import { logger } from '../utils/logger';
+import { API_BASE_URL } from '../config/api';
 
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
 }
 
 const axiosInstance = axios.create({
-  baseURL: 'http://localhost:8081',
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },

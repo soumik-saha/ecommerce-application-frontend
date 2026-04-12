@@ -1,8 +1,9 @@
 import axios from 'axios';
 import type { AuthResponse, LoginRequest, RegisterRequest } from '../../types';
 import { logger } from '../../utils/logger';
+import { API_BASE_URL } from '../../config/api';
 
-const BASE_URL = 'http://localhost:8081';
+const BASE_URL = API_BASE_URL;
 
 export const authService = {
   async login(data: LoginRequest): Promise<AuthResponse> {
