@@ -40,13 +40,13 @@ const ProductListPage: React.FC = () => {
     }
   };
 
-  const handleAddToCart = async (product: ProductResponse) => {
+  const handleAddToCart = async (product: ProductResponse, quantity: number) => {
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
       return;
     }
     try {
-      const cart = await cartService.addToCart(product.id, 1);
+      const cart = await cartService.addToCart(product.id, quantity);
       dispatch(setCartItems(cart.items));
       toast.success(`${product.name} added to cart!`);
     } catch (err) {

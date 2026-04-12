@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { Trash2, ShoppingBag, ArrowLeft } from 'lucide-react';
+import { Trash2, ShoppingBag, ArrowLeft, Minus, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cartService } from './cartService';
 import { orderService } from '../orders/orderService';
@@ -18,6 +18,7 @@ const CartPage: React.FC = () => {
   const queryClient = useQueryClient();
   const { items, totalAmount } = useAppSelector((state) => state.cart);
   const [placingOrder, setPlacingOrder] = React.useState(false);
+  const [updatingProductId, setUpdatingProductId] = React.useState<number | null>(null);
 
   const { isLoading } = useQuery({
     queryKey: ['cart'],
@@ -36,6 +37,19 @@ const CartPage: React.FC = () => {
       toast.success('Item removed from cart');
     } catch (err) {
       toast.error(parseError(err));
+    }
+  };
+
+  const handleQuantityChange = async (productId: number, currentQuantity: number, nextQuantity: number) => {
+    setUpdatingProductId(productId);
+    try {
+      const cart = await cartService.updateCartItemQuantity(productId, currentQuantity, nextQuantity);
+      dispatch(setCartItems(cart.items));
+      queryClient.invalidateQueries({ queryKey: ['cart'] });
+    } catch (err) {
+      toast.error(parseError(err));
+    } finally {
+      setUpdatingProductId(null);
     }
   };
 
@@ -96,12 +110,31 @@ const CartPage: React.FC = () => {
                 </div>
                 <div className="flex-1 min-w-0">
                   <h3 className="font-semibold text-gray-900 truncate">{item.productName}</h3>
-                  <p className="text-sm text-gray-500">Qty: {item.quantity}</p>
+                  <div className="mt-1 inline-flex items-center gap-2 rounded-lg border border-gray-300 px-2 py-1">
+                    <button
+                      onClick={() => handleQuantityChange(item.productId, item.quantity, item.quantity - 1)}
+                      disabled={updatingProductId === item.productId}
+                      className="rounded p-1 text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+                      aria-label={`Decrease ${item.productName} quantity`}
+                    >
+                      <Minus size={14} />
+                    </button>
+                    <span className="min-w-6 text-center text-sm font-medium text-gray-900">{item.quantity}</span>
+                    <button
+                      onClick={() => handleQuantityChange(item.productId, item.quantity, item.quantity + 1)}
+                      disabled={updatingProductId === item.productId}
+                      className="rounded p-1 text-gray-600 hover:bg-gray-100 disabled:opacity-40"
+                      aria-label={`Increase ${item.productName} quantity`}
+                    >
+                      <Plus size={14} />
+                    </button>
+                  </div>
                   <p className="text-sm font-medium text-gray-900">${(item.price * item.quantity).toFixed(2)}</p>
                 </div>
                 <button
                   onClick={() => handleRemove(item.productId)}
-                  className="rounded-lg p-2 text-red-500 hover:bg-red-50"
+                  disabled={updatingProductId === item.productId}
+                  className="rounded-lg p-2 text-red-500 hover:bg-red-50 disabled:opacity-40"
                 >
                   <Trash2 size={18} />
                 </button>

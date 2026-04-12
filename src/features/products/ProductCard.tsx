@@ -1,15 +1,17 @@
-import React, { memo } from 'react';
+import React, { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ShoppingCart } from 'lucide-react';
+import { Minus, Plus, ShoppingCart } from 'lucide-react';
 import type { ProductResponse } from '../../types';
 import { Button } from '../../components/ui/Button';
 
 interface Props {
   product: ProductResponse;
-  onAddToCart?: (product: ProductResponse) => void;
+  onAddToCart?: (product: ProductResponse, quantity: number) => void;
 }
 
 const ProductCard: React.FC<Props> = ({ product, onAddToCart }) => {
+  const [quantity, setQuantity] = useState(1);
+
   return (
     <div className="group rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden">
       <Link to={`/products/${product.id}`} className="flex-1">
@@ -39,8 +41,27 @@ const ProductCard: React.FC<Props> = ({ product, onAddToCart }) => {
         </div>
       </Link>
       <div className="px-4 pb-4">
+        {product.stockQuantity > 0 && (
+          <div className="mb-3 inline-flex items-center gap-2 rounded-lg border border-gray-300 px-2 py-1">
+            <button
+              onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+              className="rounded p-1 text-gray-600 hover:bg-gray-100"
+              aria-label={`Decrease ${product.name} quantity`}
+            >
+              <Minus size={14} />
+            </button>
+            <span className="min-w-6 text-center text-sm font-medium text-gray-900">{quantity}</span>
+            <button
+              onClick={() => setQuantity((q) => Math.min(product.stockQuantity, q + 1))}
+              className="rounded p-1 text-gray-600 hover:bg-gray-100"
+              aria-label={`Increase ${product.name} quantity`}
+            >
+              <Plus size={14} />
+            </button>
+          </div>
+        )}
         <Button
-          onClick={() => onAddToCart?.(product)}
+          onClick={() => onAddToCart?.(product, quantity)}
           size="sm"
           className="w-full gap-2"
           disabled={product.stockQuantity === 0}

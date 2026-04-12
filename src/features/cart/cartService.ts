@@ -96,6 +96,41 @@ export const cartService = {
     }
   },
 
+  async updateCartItemQuantity(productId: number, currentQuantity: number, nextQuantity: number): Promise<CartResponse> {
+    const normalizedNextQuantity = Math.max(0, nextQuantity);
+
+    logger.info('Update cart item quantity requested', {
+      productId,
+      currentQuantity,
+      nextQuantity: normalizedNextQuantity,
+    });
+
+    try {
+      if (normalizedNextQuantity === currentQuantity) {
+        return this.getCart();
+      }
+
+      if (normalizedNextQuantity === 0) {
+        await this.removeFromCart(productId);
+        return this.getCart();
+      }
+
+      if (normalizedNextQuantity > currentQuantity) {
+        return this.addToCart(productId, normalizedNextQuantity - currentQuantity);
+      }
+
+      await this.removeFromCart(productId);
+      return this.addToCart(productId, normalizedNextQuantity);
+    } catch (error) {
+      logger.error('Update cart item quantity failed', error, {
+        productId,
+        currentQuantity,
+        nextQuantity: normalizedNextQuantity,
+      });
+      throw error;
+    }
+  },
+
   async removeFromCart(productId: number): Promise<void> {
     logger.info('Remove from cart requested', { productId });
     try {
