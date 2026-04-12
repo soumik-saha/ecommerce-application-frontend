@@ -3,6 +3,7 @@ import type { AxiosError, InternalAxiosRequestConfig } from 'axios';
 import { store } from '../app/store';
 import { setCredentials, logout } from '../features/auth/authSlice';
 import { authService } from '../features/auth/authService';
+import { logger } from '../utils/logger';
 
 interface ExtendedAxiosRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
@@ -66,21 +67,37 @@ axiosInstance.interceptors.response.use(
 
       const refreshToken = localStorage.getItem('refreshToken');
       if (!refreshToken) {
+        logger.warn('Authentication refresh skipped because no refresh token was available', {
+          url: originalRequest.url,
+          method: originalRequest.method,
+        });
         store.dispatch(logout());
         isRefreshing = false;
         return Promise.reject(error);
       }
 
       try {
+        logger.info('Refreshing expired access token', {
+          url: originalRequest.url,
+          method: originalRequest.method,
+        });
         const authResponse = await authService.refreshToken(refreshToken);
         store.dispatch(setCredentials(authResponse));
         processQueue(null, authResponse.accessToken);
         if (originalRequest.headers) {
           originalRequest.headers.Authorization = `Bearer ${authResponse.accessToken}`;
         }
+        logger.info('Access token refreshed successfully', {
+          url: originalRequest.url,
+          method: originalRequest.method,
+        });
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         processQueue(refreshError as AxiosError, null);
+        logger.error('Failed to refresh access token', refreshError, {
+          url: originalRequest.url,
+          method: originalRequest.method,
+        });
         store.dispatch(logout());
         return Promise.reject(refreshError);
       } finally {
