@@ -4,6 +4,10 @@ import { useAppDispatch } from '../../app/hooks';
 import { useAuth } from '../../hooks/useAuth';
 import { setCartItems } from '../../features/cart/cartSlice';
 import { cartService } from '../../features/cart/cartService';
+import { setWishlistItems } from '../../features/wishlist/wishlistSlice';
+import { wishlistService } from '../../features/wishlist/wishlistService';
+import { setNotifications } from '../../features/notifications/notificationSlice';
+import { notificationService } from '../../features/notifications/notificationService';
 import { Navbar } from './Navbar';
 import { Footer } from './Footer';
 
@@ -37,6 +41,11 @@ export const MainLayout: React.FC = () => {
       cancelled = true;
     };
   }, [dispatch, isAuthenticated]);
+
+  React.useEffect(() => {
+    dispatch(setWishlistItems(wishlistService.getWishlistItems()));
+    dispatch(setNotifications(notificationService.getNotifications()));
+  }, [dispatch]);
 
   return (
     <div className="flex min-h-screen flex-col bg-gray-50">

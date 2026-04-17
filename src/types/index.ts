@@ -66,6 +66,20 @@ export interface OrderItem {
   productName: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
+}
+
+export interface ShippingAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  country?: string;
+}
+
+export interface OrderStatusUpdate {
+  status: string;
+  timestamp?: string;
 }
 
 export interface Order {
@@ -75,6 +89,12 @@ export interface Order {
   totalAmount: number;
   status: string;
   createdAt: string;
+  shippingAddress?: ShippingAddress;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  statusHistory?: OrderStatusUpdate[];
+  returnStatus?: string;
+  returnRequestedAt?: string;
 }
 
 export interface LoginRequest {
@@ -104,4 +124,42 @@ export interface ChatMessage {
   role: 'user' | 'bot';
   content: string;
   timestamp: Date;
+}
+
+export interface WishlistItem {
+  productId: number;
+  productName: string;
+  price: number;
+  imageUrl?: string;
+  category?: string;
+  stockQuantity?: number;
+  addedAt?: string;
+}
+
+export interface ProductReview {
+  id: string;
+  productId: number;
+  rating: number;
+  title?: string;
+  comment?: string;
+  userName: string;
+  createdAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+  type?: 'order' | 'wishlist' | 'review' | 'return' | 'payment' | 'system';
+  link?: string;
+}
+
+export interface ReturnRequest {
+  orderId: number;
+  status: string;
+  requestedAt: string;
+  reason?: string;
+  comment?: string;
 }

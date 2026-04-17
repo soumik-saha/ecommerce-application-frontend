@@ -10,7 +10,13 @@ const ProductDetailPage = lazy(() => import('../features/products/ProductDetailP
 const LoginPage = lazy(() => import('../features/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../features/auth/RegisterPage'));
 const CartPage = lazy(() => import('../features/cart/CartPage'));
+const PaymentPage = lazy(() => import('../features/payments/PaymentPage'));
 const OrderSuccessPage = lazy(() => import('../features/orders/OrderSuccessPage'));
+const OrdersPage = lazy(() => import('../features/orders/OrdersPage'));
+const OrderDetailsPage = lazy(() => import('../features/orders/OrderDetailsPage'));
+const ReturnsPage = lazy(() => import('../features/orders/ReturnsPage'));
+const WishlistPage = lazy(() => import('../features/wishlist/WishlistPage'));
+const NotificationsPage = lazy(() => import('../features/notifications/NotificationsPage'));
 const AdminDashboard = lazy(() => import('../features/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('../features/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('../features/admin/AdminOrders'));
@@ -35,9 +41,39 @@ export const AppRoutes: React.FC = () => (
           <Suspense fallback={<PageLoader />}><CartPage /></Suspense>
         </ProtectedRoute>
       } />
+      <Route path="/payment" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><PaymentPage /></Suspense>
+        </ProtectedRoute>
+      } />
       <Route path="/orders/success" element={
         <ProtectedRoute>
           <Suspense fallback={<PageLoader />}><OrderSuccessPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/orders" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><OrdersPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/orders/:id" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><OrderDetailsPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/returns" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><ReturnsPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/wishlist" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><WishlistPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/notifications" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><NotificationsPage /></Suspense>
         </ProtectedRoute>
       } />
       <Route path="/admin" element={

@@ -1,8 +1,9 @@
 import React, { memo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Minus, Plus, ShoppingCart } from 'lucide-react';
+import { Minus, Plus, ShoppingCart, Heart } from 'lucide-react';
 import type { ProductResponse } from '../../types';
 import { Button } from '../../components/ui/Button';
+import { useWishlist } from '../../hooks/useWishlist';
 
 interface Props {
   product: ProductResponse;
@@ -11,11 +12,13 @@ interface Props {
 
 const ProductCard: React.FC<Props> = ({ product, onAddToCart }) => {
   const [quantity, setQuantity] = useState(1);
+  const { toggleWishlist, isInWishlist } = useWishlist();
+  const wishlisted = isInWishlist(product.id);
 
   return (
     <div className="group rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-all duration-200 flex flex-col overflow-hidden">
       <Link to={`/products/${product.id}`} className="flex-1">
-        <div className="aspect-square overflow-hidden bg-gray-100">
+        <div className="relative aspect-square overflow-hidden bg-gray-100">
           {product.imageUrl ? (
             <img
               src={product.imageUrl}
@@ -30,6 +33,19 @@ const ProductCard: React.FC<Props> = ({ product, onAddToCart }) => {
               🛍️
             </div>
           )}
+          <button
+            onClick={(event) => {
+              event.preventDefault();
+              event.stopPropagation();
+              toggleWishlist(product);
+            }}
+            className={`absolute right-3 top-3 rounded-full p-2 shadow-sm transition ${
+              wishlisted ? 'bg-pink-600 text-white' : 'bg-white text-gray-600 hover:text-pink-500'
+            }`}
+            aria-label={wishlisted ? 'Remove from wishlist' : 'Add to wishlist'}
+          >
+            <Heart size={16} className={wishlisted ? 'fill-white' : ''} />
+          </button>
         </div>
         <div className="p-4">
           {product.category && (
