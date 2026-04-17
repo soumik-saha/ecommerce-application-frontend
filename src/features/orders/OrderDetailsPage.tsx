@@ -152,8 +152,8 @@ const OrderDetailsPage: React.FC = () => {
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                {items.map((item, index) => (
-                  <div key={`${item.productId}-${index}`} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
+                {items.map((item) => (
+                  <div key={item.productId} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
                     <div className="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.imageUrl ? (
                         <img
@@ -190,7 +190,7 @@ const OrderDetailsPage: React.FC = () => {
               {timeline.map((step, index) => {
                 const isActive = index <= currentIndex;
                 return (
-                  <div key={index} className="flex items-start gap-3">
+                  <div key={step.status} className="flex items-start gap-3">
                     <span className={`mt-1 h-2.5 w-2.5 rounded-full ${isActive ? 'bg-blue-600' : 'bg-gray-300'}`} />
                     <div>
                       <p className={`text-sm font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>
