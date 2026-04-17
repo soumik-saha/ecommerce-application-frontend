@@ -152,8 +152,8 @@ const OrderDetailsPage: React.FC = () => {
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                {items.map((item) => (
-                  <div key={item.productId} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
+                {items.map((item, index) => (
+                  <div key={`${item.productId}-${index}`} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
                     <div className="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.imageUrl ? (
                         <img
