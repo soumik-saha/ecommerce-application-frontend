@@ -66,6 +66,20 @@ export interface OrderItem {
   productName: string;
   price: number;
   quantity: number;
+  imageUrl?: string;
+}
+
+export interface ShippingAddress {
+  street?: string;
+  city?: string;
+  state?: string;
+  zipcode?: string;
+  country?: string;
+}
+
+export interface OrderStatusUpdate {
+  status: string;
+  timestamp?: string;
 }
 
 export interface Order {
@@ -75,6 +89,12 @@ export interface Order {
   totalAmount: number;
   status: string;
   createdAt: string;
+  shippingAddress?: ShippingAddress;
+  paymentStatus?: string;
+  paymentMethod?: string;
+  statusHistory?: OrderStatusUpdate[];
+  returnStatus?: string;
+  returnRequestedAt?: string;
 }
 
 export interface LoginRequest {

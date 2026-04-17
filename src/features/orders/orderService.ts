@@ -38,6 +38,17 @@ export const orderService = {
     }
   },
 
+  async getOrderById(id: number): Promise<Order> {
+    logger.debug('Loading order details', { id });
+    try {
+      const response = await axiosInstance.get<Order>(`/api/orders/${id}`);
+      return response.data;
+    } catch (error) {
+      logger.error('Failed to load order details', error, { id });
+      throw error;
+    }
+  },
+
   async getMyOrders(page = 0, size = 10): Promise<Page<Order>> {
     logger.debug('Loading customer orders', { page, size });
     try {
