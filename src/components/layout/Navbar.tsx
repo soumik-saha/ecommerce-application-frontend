@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ShoppingCart, User, LogOut, Settings, Search } from 'lucide-react';
+import { ShoppingCart, User, LogOut, Settings, Search, Package } from 'lucide-react';
 import { useAppDispatch } from '../../app/hooks';
 import { logout } from '../../features/auth/authSlice';
 import { clearCart } from '../../features/cart/cartSlice';
@@ -84,6 +84,13 @@ export const Navbar: React.FC = () => {
                         <Settings size={16} /> Admin Dashboard
                       </Link>
                     )}
+                    <Link
+                      to="/orders"
+                      onClick={() => setMenuOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
+                    >
+                      <Package size={16} /> My Orders
+                    </Link>
                     <button
                       onClick={() => { handleLogout(); setMenuOpen(false); }}
                       className="flex w-full items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-gray-50"

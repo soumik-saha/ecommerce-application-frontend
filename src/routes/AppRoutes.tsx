@@ -11,6 +11,8 @@ const LoginPage = lazy(() => import('../features/auth/LoginPage'));
 const RegisterPage = lazy(() => import('../features/auth/RegisterPage'));
 const CartPage = lazy(() => import('../features/cart/CartPage'));
 const OrderSuccessPage = lazy(() => import('../features/orders/OrderSuccessPage'));
+const OrdersPage = lazy(() => import('../features/orders/OrdersPage'));
+const OrderDetailsPage = lazy(() => import('../features/orders/OrderDetailsPage'));
 const AdminDashboard = lazy(() => import('../features/admin/AdminDashboard'));
 const AdminProducts = lazy(() => import('../features/admin/AdminProducts'));
 const AdminOrders = lazy(() => import('../features/admin/AdminOrders'));
@@ -38,6 +40,16 @@ export const AppRoutes: React.FC = () => (
       <Route path="/orders/success" element={
         <ProtectedRoute>
           <Suspense fallback={<PageLoader />}><OrderSuccessPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/orders" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><OrdersPage /></Suspense>
+        </ProtectedRoute>
+      } />
+      <Route path="/orders/:id" element={
+        <ProtectedRoute>
+          <Suspense fallback={<PageLoader />}><OrderDetailsPage /></Suspense>
         </ProtectedRoute>
       } />
       <Route path="/admin" element={
