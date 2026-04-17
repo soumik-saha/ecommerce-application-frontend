@@ -17,6 +17,7 @@ const statusColors: Record<string, string> = {
 };
 
 const defaultTimeline = ['PENDING', 'PROCESSING', 'SHIPPED', 'DELIVERED'];
+const getFallbackImage = (name: string) => `https://placehold.co/200x200?text=${encodeURIComponent(name)}`;
 
 const formatStatus = (status: string) =>
   status
@@ -44,6 +45,7 @@ const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const orderId = Number(id);
+  const hasValidId = Number.isFinite(orderId) && orderId > 0;
   const [showReturnForm, setShowReturnForm] = React.useState(false);
   const [returnReason, setReturnReason] = React.useState('');
   const [returnComment, setReturnComment] = React.useState('');
@@ -52,7 +54,7 @@ const OrderDetailsPage: React.FC = () => {
   const { data: order, isLoading, error } = useQuery({
     queryKey: ['order', orderId],
     queryFn: () => orderService.getOrderById(orderId),
-    enabled: Number.isFinite(orderId),
+    enabled: hasValidId,
   });
 
   if (error) {
@@ -150,8 +152,8 @@ const OrderDetailsPage: React.FC = () => {
               </div>
             ) : (
               <div className="mt-4 space-y-4">
-                {items.map((item) => (
-                  <div key={`${item.productId}-${item.productName}`} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
+                {items.map((item, index) => (
+                  <div key={`${item.productId}-${index}`} className="flex items-center gap-4 rounded-lg border border-gray-100 p-3">
                     <div className="h-16 w-16 rounded-lg overflow-hidden bg-gray-100 flex-shrink-0">
                       {item.imageUrl ? (
                         <img
@@ -159,7 +161,7 @@ const OrderDetailsPage: React.FC = () => {
                           alt={item.productName}
                           className="h-full w-full object-cover"
                           onError={(event) => {
-                            (event.target as HTMLImageElement).src = `https://placehold.co/200x200?text=${encodeURIComponent(item.productName)}`;
+                            (event.target as HTMLImageElement).src = getFallbackImage(item.productName);
                           }}
                         />
                       ) : (
@@ -188,7 +190,7 @@ const OrderDetailsPage: React.FC = () => {
               {timeline.map((step, index) => {
                 const isActive = index <= currentIndex;
                 return (
-                  <div key={`${step.status}-${index}`} className="flex items-start gap-3">
+                  <div key={index} className="flex items-start gap-3">
                     <span className={`mt-1 h-2.5 w-2.5 rounded-full ${isActive ? 'bg-blue-600' : 'bg-gray-300'}`} />
                     <div>
                       <p className={`text-sm font-medium ${isActive ? 'text-gray-900' : 'text-gray-500'}`}>

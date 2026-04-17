@@ -41,6 +41,11 @@ export const orderService = {
   async getOrderById(id: number): Promise<Order> {
     logger.debug('Loading order details', { id });
     try {
+      if (!Number.isFinite(id) || id <= 0) {
+        const error = new Error('Invalid order id');
+        logger.warn('Order details request rejected due to invalid id', { id });
+        throw error;
+      }
       const response = await axiosInstance.get<Order>(`/api/orders/${id}`);
       return response.data;
     } catch (error) {
