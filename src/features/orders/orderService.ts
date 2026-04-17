@@ -51,15 +51,16 @@ export const orderService = {
 
       const orders = normalizeOrderList(response.data);
       const totalElements = orders.length;
-      const totalPages = Math.max(1, Math.ceil(totalElements / size));
-      const start = page * size;
+      const normalizedSize = size > 0 ? size : 10;
+      const totalPages = Math.max(1, Math.ceil(totalElements / normalizedSize));
+      const start = page * normalizedSize;
 
       return {
-        content: orders.slice(start, start + size),
+        content: orders.slice(start, start + normalizedSize),
         totalElements,
         totalPages,
         number: page,
-        size,
+        size: normalizedSize,
         first: page === 0,
         last: page >= totalPages - 1,
       };
