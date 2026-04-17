@@ -125,3 +125,33 @@ export interface ChatMessage {
   content: string;
   timestamp: Date;
 }
+
+export interface WishlistItem {
+  productId: number;
+  productName: string;
+  price: number;
+  imageUrl?: string;
+  category?: string;
+  stockQuantity?: number;
+  addedAt?: string;
+}
+
+export interface ProductReview {
+  id: string;
+  productId: number;
+  rating: number;
+  title?: string;
+  comment?: string;
+  userName: string;
+  createdAt: string;
+}
+
+export interface NotificationItem {
+  id: string;
+  title: string;
+  message: string;
+  createdAt: string;
+  read: boolean;
+  type?: 'order' | 'wishlist' | 'review' | 'return' | 'payment' | 'system';
+  link?: string;
+}

@@ -4,9 +4,8 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { Trash2, ShoppingBag, ArrowLeft, Minus, Plus } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { cartService } from './cartService';
-import { orderService } from '../orders/orderService';
 import { useAppDispatch } from '../../app/hooks';
-import { setCartItems, removeCartItem, clearCart } from './cartSlice';
+import { setCartItems, removeCartItem } from './cartSlice';
 import { useAppSelector } from '../../app/hooks';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
@@ -17,7 +16,6 @@ const CartPage: React.FC = () => {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const { items, totalAmount } = useAppSelector((state) => state.cart);
-  const [placingOrder, setPlacingOrder] = React.useState(false);
   const [updatingProductId, setUpdatingProductId] = React.useState<number | null>(null);
 
   const { isLoading } = useQuery({
@@ -50,20 +48,6 @@ const CartPage: React.FC = () => {
       toast.error(parseError(err));
     } finally {
       setUpdatingProductId(null);
-    }
-  };
-
-  const handlePlaceOrder = async () => {
-    try {
-      setPlacingOrder(true);
-      await orderService.placeOrder();
-      dispatch(clearCart());
-      queryClient.invalidateQueries({ queryKey: ['cart'] });
-      navigate('/orders/success');
-    } catch (err) {
-      toast.error(parseError(err));
-    } finally {
-      setPlacingOrder(false);
     }
   };
 
@@ -148,12 +132,11 @@ const CartPage: React.FC = () => {
               <span>${totalAmount.toFixed(2)}</span>
             </div>
             <Button
-              onClick={handlePlaceOrder}
-              loading={placingOrder}
+              onClick={() => navigate('/payment')}
               className="mt-4 w-full"
               size="lg"
             >
-              Place Order
+              Proceed to Payment
             </Button>
           </div>
         </div>

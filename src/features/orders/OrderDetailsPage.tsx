@@ -6,6 +6,7 @@ import { orderService } from './orderService';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { parseError } from '../../utils/errorParser';
+import { useNotifications } from '../../hooks/useNotifications';
 import type { Order, OrderItem } from '../../types';
 
 const statusColors: Record<string, string> = {
@@ -44,6 +45,7 @@ const normalizeItems = (items?: OrderItem[]) => items ?? [];
 const OrderDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const { addNotification } = useNotifications();
   const orderId = Number(id);
   const hasValidId = Number.isFinite(orderId) && orderId > 0;
   const [showReturnForm, setShowReturnForm] = React.useState(false);
@@ -114,6 +116,14 @@ const OrderDetailsPage: React.FC = () => {
     setShowReturnForm(false);
     setReturnReason('');
     setReturnComment('');
+    if (order) {
+      addNotification({
+        title: 'Return request submitted',
+        message: `Your return request for order #${order.id} has been received.`,
+        type: 'return',
+        link: `/orders/${order.id}`,
+      });
+    }
   };
 
   return (
