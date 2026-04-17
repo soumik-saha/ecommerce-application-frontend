@@ -23,6 +23,11 @@ const saveStore = (store: ReviewStore) => {
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 };
 
+const generateId = () =>
+  typeof globalThis.crypto?.randomUUID === 'function'
+    ? globalThis.crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
+
 export const reviewService = {
   getReviews(productId: number): ProductReview[] {
     if (!canUseStorage()) return [];
@@ -30,12 +35,12 @@ export const reviewService = {
     return store[productId] ?? [];
   },
 
-  addReview(productId: number, review: Omit<ProductReview, 'id' | 'createdAt'>): ProductReview[] {
+  addReview(productId: number, review: Omit<ProductReview, 'id' | 'createdAt' | 'productId'>): ProductReview[] {
     if (!canUseStorage()) return [];
     const store = safelyParseReviews(window.localStorage.getItem(STORAGE_KEY));
     const nextReview: ProductReview = {
       ...review,
-      id: `${Date.now()}-${Math.random().toString(16).slice(2)}`,
+      id: generateId(),
       productId,
       createdAt: new Date().toISOString(),
     };

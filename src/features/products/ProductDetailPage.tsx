@@ -103,7 +103,6 @@ const ProductDetailPage: React.FC = () => {
       return;
     }
     const nextReviews = reviewService.addReview(product.id, {
-      productId: product.id,
       rating,
       title: reviewTitle.trim() || undefined,
       comment: reviewComment.trim() || undefined,
