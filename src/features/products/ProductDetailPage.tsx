@@ -17,6 +17,9 @@ import { reviewService } from '../reviews/reviewService';
 import type { ProductResponse, ProductReview } from '../../types';
 import ProductCard from './ProductCard';
 
+const RECOMMENDATION_QUERY_SIZE = 12;
+const RECOMMENDATION_LIMIT = 4;
+
 const ProductDetailPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -41,13 +44,13 @@ const ProductDetailPage: React.FC = () => {
     queryKey: ['recommendations', product?.id, product?.category],
     enabled: !!product,
     queryFn: async () => {
-      const response = await productService.getProducts('', 0, 12);
+      const response = await productService.getProducts('', 0, RECOMMENDATION_QUERY_SIZE);
       const candidates = response.content.filter((item) => item.id !== product?.id);
       const categoryMatches = product?.category
         ? candidates.filter((item) => item.category === product.category)
         : [];
       const selection = categoryMatches.length > 0 ? categoryMatches : candidates;
-      return selection.slice(0, 4);
+      return selection.slice(0, RECOMMENDATION_LIMIT);
     },
   });
 

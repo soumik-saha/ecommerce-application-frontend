@@ -1,4 +1,5 @@
 import type { NotificationItem } from '../../types';
+import { generateId } from '../../utils/id';
 import { logger } from '../../utils/logger';
 
 const STORAGE_KEY = 'shopapp-notifications';
@@ -17,11 +18,6 @@ const safelyParseNotifications = (raw: string | null): NotificationItem[] => {
 const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined';
 
 export type NotificationInput = Pick<NotificationItem, 'title' | 'message' | 'type' | 'link'>;
-
-const generateId = () =>
-  typeof globalThis.crypto?.randomUUID === 'function'
-    ? globalThis.crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 export const notificationService = {
   getNotifications(): NotificationItem[] {

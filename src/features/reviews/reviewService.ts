@@ -1,4 +1,5 @@
 import type { ProductReview } from '../../types';
+import { generateId } from '../../utils/id';
 import { logger } from '../../utils/logger';
 
 const STORAGE_KEY = 'shopapp-product-reviews';
@@ -22,11 +23,6 @@ const saveStore = (store: ReviewStore) => {
   if (!canUseStorage()) return;
   window.localStorage.setItem(STORAGE_KEY, JSON.stringify(store));
 };
-
-const generateId = () =>
-  typeof globalThis.crypto?.randomUUID === 'function'
-    ? globalThis.crypto.randomUUID()
-    : `${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
 export const reviewService = {
   getReviews(productId: number): ProductReview[] {

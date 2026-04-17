@@ -4,6 +4,8 @@ import { notificationService } from '../features/notifications/notificationServi
 import { clearNotifications, setNotifications } from '../features/notifications/notificationSlice';
 import type { NotificationItem } from '../types';
 
+const MAX_NOTIFICATIONS = 50;
+
 const syncNotifications = (dispatch: ReturnType<typeof useAppDispatch>, items: NotificationItem[]) => {
   notificationService.saveNotifications(items);
   dispatch(setNotifications(items));
@@ -16,7 +18,7 @@ export const useNotifications = () => {
   const addNotification = useCallback(
     (input: Pick<NotificationItem, 'title' | 'message' | 'type' | 'link'>) => {
       const nextNotification = notificationService.createNotification(input);
-      const nextItems = [nextNotification, ...items].slice(0, 50);
+      const nextItems = [nextNotification, ...items].slice(0, MAX_NOTIFICATIONS);
       syncNotifications(dispatch, nextItems);
       return nextNotification;
     },
