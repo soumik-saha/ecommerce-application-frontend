@@ -59,14 +59,18 @@ const ProductDetailPage: React.FC = () => {
     setReviews(reviewService.getReviews(product.id));
   }, [product]);
 
-  const addProductToCart = async (selectedProduct: ProductResponse, quantityToAdd: number, showLoader = false) => {
+  const addProductToCart = async (
+    selectedProduct: ProductResponse,
+    quantityToAdd: number,
+    withLoadingIndicator = false
+  ) => {
     if (!isAuthenticated) {
       toast.error('Please login to add items to cart');
       navigate('/login');
       return;
     }
     try {
-      if (showLoader) {
+      if (withLoadingIndicator) {
         setAddingToCart(true);
       }
       const cart = await cartService.addToCart(selectedProduct.id, quantityToAdd);
@@ -75,7 +79,7 @@ const ProductDetailPage: React.FC = () => {
     } catch (err) {
       toast.error(parseError(err));
     } finally {
-      if (showLoader) {
+      if (withLoadingIndicator) {
         setAddingToCart(false);
       }
     }

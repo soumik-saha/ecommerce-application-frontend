@@ -97,7 +97,7 @@ const ReturnsPage: React.FC = () => {
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="font-semibold text-gray-900">Order #{order.id}</p>
-                  <p className="text-sm text-gray-500">Delivered on {formatDate(order.createdAt)}</p>
+                  <p className="text-sm text-gray-500">Placed on {formatDate(order.createdAt)}</p>
                 </div>
                 <Link
                   to={`/orders/${order.id}`}
