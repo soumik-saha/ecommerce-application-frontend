@@ -13,6 +13,34 @@ import { Skeleton } from '../../components/ui/Skeleton';
 import { parseError } from '../../utils/errorParser';
 import { useNotifications } from '../../hooks/useNotifications';
 
+const isValidCardNumber = (value: string) => {
+  if (!/^\d{12,19}$/.test(value)) return false;
+  let sum = 0;
+  let shouldDouble = false;
+  for (let i = value.length - 1; i >= 0; i -= 1) {
+    let digit = Number(value[i]);
+    if (shouldDouble) {
+      digit *= 2;
+      if (digit > 9) {
+        digit -= 9;
+      }
+    }
+    sum += digit;
+    shouldDouble = !shouldDouble;
+  }
+  return sum % 10 === 0;
+};
+
+const isValidExpiry = (value: string) => {
+  const match = value.match(/^(\d{2})\s*\/\s*(\d{2})$/);
+  if (!match) return false;
+  const month = Number(match[1]);
+  const year = Number(match[2]) + 2000;
+  if (month < 1 || month > 12) return false;
+  const expiryDate = new Date(year, month);
+  return expiryDate > new Date();
+};
+
 const PaymentPage: React.FC = () => {
   const dispatch = useAppDispatch();
   const queryClient = useQueryClient();
@@ -35,11 +63,22 @@ const PaymentPage: React.FC = () => {
     },
   });
 
-  const cardFieldsValid = Boolean(cardholderName.trim() && cardNumber.trim() && expiry.trim() && cvv.trim());
+  const normalizedCardNumber = cardNumber.replace(/\s+/g, '');
+  const cardNumberValid = normalizedCardNumber ? isValidCardNumber(normalizedCardNumber) : false;
+  const expiryValid = expiry ? isValidExpiry(expiry) : false;
+  const cvvValid = cvv ? /^\d{3,4}$/.test(cvv) : false;
+  const cardFieldsValid = Boolean(cardholderName.trim() && cardNumberValid && expiryValid && cvvValid);
   const isFormValid = paymentMethod !== 'CARD' || cardFieldsValid;
+  const cardNumberError = cardNumber && !cardNumberValid ? 'Enter a valid card number' : undefined;
+  const expiryError = expiry && !expiryValid ? 'Use MM/YY with a future date' : undefined;
+  const cvvError = cvv && !cvvValid ? 'Enter a 3 or 4 digit CVV' : undefined;
 
   const handlePlaceOrder = async () => {
     try {
+      if (!isFormValid) {
+        toast.error('Please complete valid payment details.');
+        return;
+      }
       setPlacingOrder(true);
       const order = await orderService.placeOrder();
       dispatch(clearCart());
@@ -162,6 +201,7 @@ const PaymentPage: React.FC = () => {
                   placeholder="1234 5678 9012 3456"
                   value={cardNumber}
                   onChange={(event) => setCardNumber(event.target.value)}
+                  error={cardNumberError}
                 />
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Input
@@ -169,12 +209,14 @@ const PaymentPage: React.FC = () => {
                     placeholder="MM/YY"
                     value={expiry}
                     onChange={(event) => setExpiry(event.target.value)}
+                    error={expiryError}
                   />
                   <Input
                     label="CVV"
                     placeholder="123"
                     value={cvv}
                     onChange={(event) => setCvv(event.target.value)}
+                    error={cvvError}
                   />
                 </div>
               </div>

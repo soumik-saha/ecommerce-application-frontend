@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { ArrowLeft, PackageOpen } from 'lucide-react';
 import { orderService } from './orderService';
+import { returnService } from './returnService';
 import { Button } from '../../components/ui/Button';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { parseError } from '../../utils/errorParser';
@@ -51,7 +52,6 @@ const OrderDetailsPage: React.FC = () => {
   const [showReturnForm, setShowReturnForm] = React.useState(false);
   const [returnReason, setReturnReason] = React.useState('');
   const [returnComment, setReturnComment] = React.useState('');
-  const [returnSubmitted, setReturnSubmitted] = React.useState(false);
 
   const { data: order, isLoading, error } = useQuery({
     queryKey: ['order', orderId],
@@ -105,17 +105,24 @@ const OrderDetailsPage: React.FC = () => {
   const currentIndex = activeIndex >= 0 ? activeIndex : timeline.length - 1;
   const paymentStatus = order.paymentStatus ?? 'Not available';
   const paymentMethod = order.paymentMethod ?? 'Not specified';
-  const returnStatus = order.returnStatus ?? (returnSubmitted ? 'REQUESTED' : undefined);
+  const localReturnRequest = returnService.getReturnRequest(order.id);
+  const returnStatus = order.returnStatus ?? localReturnRequest?.status;
+  const returnRequestedAt = order.returnRequestedAt ?? localReturnRequest?.requestedAt;
 
   const handleReturnSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!returnReason) {
       return;
     }
-    setReturnSubmitted(true);
     setShowReturnForm(false);
     setReturnReason('');
     setReturnComment('');
+    returnService.saveReturnRequest(order.id, {
+      status: 'REQUESTED',
+      requestedAt: new Date().toISOString(),
+      reason: returnReason,
+      comment: returnComment,
+    });
     if (order) {
       addNotification({
         title: 'Return request submitted',
@@ -242,7 +249,7 @@ const OrderDetailsPage: React.FC = () => {
                     {formatStatus(returnStatus)}
                   </span>
                   <span className="text-gray-500">
-                    {order.returnRequestedAt ? `Requested on ${formatDate(order.returnRequestedAt)}` : 'Request received'}
+                    {returnRequestedAt ? `Requested on ${formatDate(returnRequestedAt)}` : 'Request received'}
                   </span>
                 </div>
               )}

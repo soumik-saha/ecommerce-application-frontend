@@ -2,9 +2,8 @@ import { useCallback, useMemo } from 'react';
 import { useAppDispatch, useAppSelector } from '../app/hooks';
 import { notificationService } from '../features/notifications/notificationService';
 import { clearNotifications, setNotifications } from '../features/notifications/notificationSlice';
+import { MAX_NOTIFICATIONS } from '../config/limits';
 import type { NotificationItem } from '../types';
-
-const MAX_NOTIFICATIONS = 50;
 
 const syncNotifications = (dispatch: ReturnType<typeof useAppDispatch>, items: NotificationItem[]) => {
   notificationService.saveNotifications(items);

@@ -98,6 +98,13 @@ const ProductDetailPage: React.FC = () => {
     return reviews.reduce((sum, review) => sum + review.rating, 0) / reviews.length;
   }, [reviews]);
 
+  const reviewDisplayName = React.useMemo(() => {
+    if (user?.email) {
+      return user.email.split('@')[0];
+    }
+    return 'Anonymous';
+  }, [user]);
+
   const handleReviewSubmit = (event: React.FormEvent) => {
     event.preventDefault();
     if (!product) return;
@@ -109,7 +116,7 @@ const ProductDetailPage: React.FC = () => {
       rating,
       title: reviewTitle.trim() || undefined,
       comment: reviewComment.trim() || undefined,
-      userName: user?.email ?? 'Anonymous',
+      userName: reviewDisplayName,
     });
     setReviews(nextReviews);
     setRating(0);

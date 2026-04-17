@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useQuery } from '@tanstack/react-query';
 import { RotateCcw } from 'lucide-react';
 import { orderService } from './orderService';
+import { returnService } from './returnService';
 import { Skeleton } from '../../components/ui/Skeleton';
 import { parseError } from '../../utils/errorParser';
 
@@ -42,8 +43,11 @@ const ReturnsPage: React.FC = () => {
   }
 
   const orders = data?.content ?? [];
-  const returnRequests = orders.filter((order) => order.returnStatus);
-  const eligibleOrders = orders.filter((order) => order.status === 'DELIVERED' && !order.returnStatus);
+  const localReturns = returnService.getReturnRequests();
+  const returnRequests = orders.filter((order) => order.returnStatus || localReturns[order.id]);
+  const eligibleOrders = orders.filter(
+    (order) => order.status === 'DELIVERED' && !(order.returnStatus || localReturns[order.id])
+  );
 
   if (!returnRequests.length && !eligibleOrders.length) {
     return (
@@ -65,27 +69,32 @@ const ReturnsPage: React.FC = () => {
       {returnRequests.length > 0 && (
         <div className="space-y-3">
           <h2 className="text-lg font-semibold text-gray-900">Active return requests</h2>
-          {returnRequests.map((order) => (
-            <div key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
-              <div className="flex flex-wrap items-center justify-between gap-4">
-                <div>
-                  <p className="font-semibold text-gray-900">Order #{order.id}</p>
-                  <p className="text-sm text-gray-500">Requested on {formatDate(order.returnRequestedAt)}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[order.returnStatus ?? 'REQUESTED'] || 'bg-gray-100 text-gray-800'}`}>
-                    {order.returnStatus}
-                  </span>
-                  <Link
-                    to={`/orders/${order.id}`}
-                    className="text-sm font-medium text-blue-600 hover:text-blue-700"
-                  >
-                    View details
-                  </Link>
+          {returnRequests.map((order) => {
+            const localReturn = localReturns[order.id];
+            const returnStatus = order.returnStatus ?? localReturn?.status ?? 'REQUESTED';
+            const returnRequestedAt = order.returnRequestedAt ?? localReturn?.requestedAt;
+            return (
+              <div key={order.id} className="rounded-xl border border-gray-200 bg-white p-4 shadow-sm">
+                <div className="flex flex-wrap items-center justify-between gap-4">
+                  <div>
+                    <p className="font-semibold text-gray-900">Order #{order.id}</p>
+                    <p className="text-sm text-gray-500">Requested on {formatDate(returnRequestedAt)}</p>
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <span className={`rounded-full px-2.5 py-0.5 text-xs font-medium ${statusColors[returnStatus] || 'bg-gray-100 text-gray-800'}`}>
+                      {returnStatus}
+                    </span>
+                    <Link
+                      to={`/orders/${order.id}`}
+                      className="text-sm font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      View details
+                    </Link>
+                  </div>
                 </div>
               </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
 

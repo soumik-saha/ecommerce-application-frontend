@@ -155,3 +155,11 @@ export interface NotificationItem {
   type?: 'order' | 'wishlist' | 'review' | 'return' | 'payment' | 'system';
   link?: string;
 }
+
+export interface ReturnRequest {
+  orderId: number;
+  status: string;
+  requestedAt: string;
+  reason?: string;
+  comment?: string;
+}
